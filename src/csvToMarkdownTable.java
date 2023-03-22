@@ -20,7 +20,7 @@ public class csvToMarkdownTable
     private final File FILE;
     private String[] row;
     private ArrayList<String[]> rows = new ArrayList<>();
-    private static StringBuilder table = new StringBuilder();
+    private static StringBuilder table = new StringBuilder("|");
     public csvToMarkdownTable(String _file)
     {
         FILE = new File(_file);
@@ -125,66 +125,58 @@ public class csvToMarkdownTable
     private void genTable()
     {
         String[] row;
-        StringBuilder rowBuilder;
+        //StringBuilder rowBuilder = new StringBuilder("|");
         //region Headers
         row = rows.get(1);
-        rowBuilder = new StringBuilder("|");
         for(String cell: row)
         {
-            rowBuilder.append(cell).append("|");
+            table.append(cell).append("|");
         }
-        rowBuilder.append("\n");
+        table.append("\n");
         //endregion
-
-
-
-
 
         //region Alignment
         row = rows.get(0); //This row has the alignment instructions
-        StringBuilder alignmentOption = new StringBuilder("|");
+        table.append("|");
         for(String cell: row)
         {
             switch (cell.toLowerCase())
             {
                 case ("l"),("left") ->
                 {
-                    alignmentOption.append(":--|");
+                    table.append(":--|");
                 }
                 case ("r"),("right") ->
                 {
-                    alignmentOption.append("--:|");
+                    table.append("--:|");
                 }
                 case ("c"),("center"), ("centre") ->
                 {
-                    alignmentOption.append(":-:|");
+                    table.append(":-:|");
                 }
                 default ->
                 {
-                    alignmentOption.append("---|"); //If there is no alignment instructions
+                    table.append("---|"); //If there is no alignment instructions
                 }
             }
         }
-        alignmentOption.append("\n");
+        table.append("\n");
         //endregion
 
-
-        //table.append(rowBuilder).append(alignmentOption);
         //region Remaining Rows
         int numberOfRows = rows.size();
 
         for(int i = 2; i < numberOfRows; i++)
         {
             row = rows.get(i);
-            rowBuilder.append("|");
+            table.append("|");
             for(String cell: row)
             {
-                rowBuilder.append(cell).append("|");
+                table.append(cell).append("|");
             }
-            rowBuilder.append("\n");
+            table.append("\n");
         }
         //endregion
-        table.append(rowBuilder);
     }
 
     public static void main(String[] args)

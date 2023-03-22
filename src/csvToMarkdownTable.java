@@ -56,7 +56,6 @@ public class csvToMarkdownTable
         {
             Scanner input = new Scanner(System.in);
 
-            //TODO Fix this
             while(!path.equalsIgnoreCase("q") && !path.endsWith("csv"))
             {
                 System.out.println("Please enter path to a csv file, q to quit.");
@@ -125,12 +124,11 @@ public class csvToMarkdownTable
     private void genTable()
     {
         String[] row;
-        //StringBuilder rowBuilder = new StringBuilder("|");
         //region Headers
         row = rows.get(1);
         for(String cell: row)
         {
-            table.append(cell).append("|");
+            table.append(cell.trim()).append("|");
         }
         table.append("\n");
         //endregion
@@ -138,27 +136,54 @@ public class csvToMarkdownTable
         //region Alignment
         row = rows.get(0); //This row has the alignment instructions
         table.append("|");
-        for(String cell: row)
+        //TODO fix this
+        //for(String cell: row)
+        for(int i = 0; i < row.length; i++)
         {
-            switch (cell.toLowerCase())
+            String alignment = row[i].toLowerCase();
+            System.out.println(alignment);
+            switch(alignment)
             {
-                case ("l"),("left") ->
+                case "l":
+                case "left":
                 {
                     table.append(":--|");
+                    break;
                 }
-                case ("r"),("right") ->
+                case "r":
+                case "right":
                 {
                     table.append("--:|");
+                    break;
                 }
-                case ("c"),("center"), ("centre") ->
+                case "c":
+                case "center":
+                case "centre":
                 {
                     table.append(":-:|");
+                    break;
                 }
-                default ->
+                default:
                 {
                     table.append("---|"); //If there is no alignment instructions
                 }
             }
+//            if(alignment.equals("l") || alignment.equals("left"))
+//            {
+//                table.append(":--|");
+//            }
+//            else if(alignment.equals("r") || alignment.equals("right"))
+//            {
+//                table.append("--:|");
+//            }
+//            else if(alignment.equals("c") || alignment.equals("centre") || alignment.equals("center"))
+//            {
+//                table.append(":-:|");
+//            }
+//            else
+//            {
+//                table.append("---|"); //If there is no alignment instructions
+//            }
         }
         table.append("\n");
         //endregion
@@ -172,7 +197,7 @@ public class csvToMarkdownTable
             table.append("|");
             for(String cell: row)
             {
-                table.append(cell).append("|");
+                table.append(cell.trim()).append("|");
             }
             table.append("\n");
         }

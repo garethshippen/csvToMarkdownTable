@@ -5,7 +5,6 @@ left, right, centre,... alignment choice
 data, data, data,...
 
 Output:
-Obsidian tables have the form
 |data|data|data|....|
 |:---|:--:|---:|....| alignment options
 |data|data|data|....|
@@ -16,20 +15,21 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class csvToObsidianTable
+public class csvToMarkdownTable
 {
     private final File FILE;
     private String[] row;
     private ArrayList<String[]> rows = new ArrayList<>();
     private static StringBuilder table = new StringBuilder();
-    public csvToObsidianTable(String _file)
+    public csvToMarkdownTable(String _file)
     {
         FILE = new File(_file);
         //Get the number of columns in the csv
         int columns = getColumns(FILE);
 
         //Exit program if there is something weird with the csv
-        if(columns > 0)
+        //System.out.println("Columns " + columns);
+        if(columns <= 0)
         {
             System.out.println("Invalid csv.");
             System.exit(1);
@@ -37,12 +37,6 @@ public class csvToObsidianTable
         row = new String[columns];
 
         getData();
-    }
-    public static void main(String[] args)
-    {
-        csvToObsidianTable runIt = new csvToObsidianTable(getFile(args));
-        runIt.genTable();
-        runIt.displayTable();
     }
 
     private void displayTable()
@@ -62,11 +56,18 @@ public class csvToObsidianTable
         {
             Scanner input = new Scanner(System.in);
 
-            while(!path.equalsIgnoreCase("q") || !path.endsWith("csv"))
+            //TODO Fix this
+            while(!path.equalsIgnoreCase("q") && !path.endsWith("csv"))
             {
                 System.out.println("Please enter path to a csv file, q to quit.");
                 path = input.nextLine();
             }
+        }
+        //If quit, terminate program.
+        if(path.equals("q"))
+        {
+            System.out.println("Goodbye");
+            System.exit(0);
         }
         return path;
     }
@@ -123,9 +124,24 @@ public class csvToObsidianTable
 
     private void genTable()
     {
+        String[] row;
+        StringBuilder rowBuilder;
+        //region Headers
+        row = rows.get(1);
+        rowBuilder = new StringBuilder("|");
+        for(String cell: row)
+        {
+            rowBuilder.append(cell).append("|");
+        }
+        rowBuilder.append("\n");
+        //endregion
+
+
+
+
 
         //region Alignment
-        String[] row = rows.get(0); //This row has the alignment instructions
+        row = rows.get(0); //This row has the alignment instructions
         StringBuilder alignmentOption = new StringBuilder("|");
         for(String cell: row)
         {
@@ -152,18 +168,9 @@ public class csvToObsidianTable
         alignmentOption.append("\n");
         //endregion
 
-        //region Headers
-        row = rows.get(1);
-        StringBuilder rowBuilder = new StringBuilder("|");
-        for(String cell: row)
-        {
-            rowBuilder.append(cell).append("|");
-        }
-        rowBuilder.append("\n");
-        //endregion
 
-        table.append(rowBuilder).append(alignmentOption);
-
+        //table.append(rowBuilder).append(alignmentOption);
+        //region Remaining Rows
         int numberOfRows = rows.size();
 
         for(int i = 2; i < numberOfRows; i++)
@@ -176,6 +183,15 @@ public class csvToObsidianTable
             }
             rowBuilder.append("\n");
         }
+        //endregion
+        table.append(rowBuilder);
+    }
+
+    public static void main(String[] args)
+    {
+        csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(args));
+        runIt.genTable();
+        runIt.displayTable();
     }
 }
 //TODO Support commas in the cells

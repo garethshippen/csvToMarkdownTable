@@ -125,7 +125,7 @@ public class csvToMarkdownTable
     {
         String[] row;
         //region Headers
-        row = rows.get(1);
+        row = rows.get(2);
         for(String cell: row)
         {
             table.append(cell.trim()).append("|");
@@ -134,14 +134,13 @@ public class csvToMarkdownTable
         //endregion
 
         //region Alignment
-        row = rows.get(0); //This row has the alignment instructions
+        row = rows.get(1); //This row has the alignment instructions
         table.append("|");
         //TODO fix this
         //for(String cell: row)
         for(int i = 0; i < row.length; i++)
         {
-            String alignment = row[i].toLowerCase();
-            System.out.println(alignment);
+            String alignment = row[i].toLowerCase().trim();
             switch(alignment)
             {
                 case "l":
@@ -191,7 +190,7 @@ public class csvToMarkdownTable
         //region Remaining Rows
         int numberOfRows = rows.size();
 
-        for(int i = 2; i < numberOfRows; i++)
+        for(int i = 3; i < numberOfRows; i++)
         {
             row = rows.get(i);
             table.append("|");
@@ -206,7 +205,9 @@ public class csvToMarkdownTable
 
     public static void main(String[] args)
     {
-        csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(args));
+        String[] test = {"C:\\Users\\Blinks\\Desktop\\test.csv"};
+        csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(test));
+        //csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(args));
         runIt.genTable();
         runIt.displayTable();
     }

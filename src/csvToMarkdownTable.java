@@ -1,7 +1,11 @@
 /*
+Takes a csv file and converts it to a markdown table.
+CSV FILE MUST BE SAVED IN UTF8
+
 Input:
 csv table needs the format
 left, right, centre,... alignment choice
+column heading, column heading, column heading,...
 data, data, data,...
 
 Output:
@@ -12,6 +16,7 @@ Output:
  */
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -21,6 +26,9 @@ public class csvToMarkdownTable
     private String[] row;
     private ArrayList<String[]> rows = new ArrayList<>();
     private static StringBuilder table = new StringBuilder("|");
+
+
+    //Constructor
     public csvToMarkdownTable(String _file)
     {
         FILE = new File(_file);
@@ -28,7 +36,6 @@ public class csvToMarkdownTable
         int columns = getColumns(FILE);
 
         //Exit program if there is something weird with the csv
-        //System.out.println("Columns " + columns);
         if(columns <= 0)
         {
             System.out.println("Invalid csv.");
@@ -39,12 +46,14 @@ public class csvToMarkdownTable
         getData();
     }
 
+    //Outputs the formatted table to the console.
     private void displayTable()
     {
         System.out.println(table);
         //TODO add copy to clipboard
     }
 
+    //Gets the file to be converted.
     private static String getFile(String[] args)
     {
         String path = "awaiting input";
@@ -58,7 +67,7 @@ public class csvToMarkdownTable
 
             while(!path.equalsIgnoreCase("q") && !path.endsWith("csv"))
             {
-                System.out.println("Please enter path to a csv file, q to quit.");
+                System.out.println("Please enter path to a csv file, or enter 'q' to quit.");
                 path = input.nextLine();
             }
         }
@@ -71,12 +80,14 @@ public class csvToMarkdownTable
         return path;
     }
 
+    //Reads the csv file and puts the data into the 'rows' ArrayList.
     private void getData()
     {
         //Read input and store
         try
         {
-            BufferedReader bf = new BufferedReader(new FileReader(FILE));
+            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8));
+            //BufferedReader bf = new BufferedReader(new FileReader(FILE));
             final String DELIMITER = ",";
             String line;
             while((line = bf.readLine()) != null)
@@ -97,12 +108,15 @@ public class csvToMarkdownTable
         }
     }
 
+    //Returns the number of columns in the table.
+    //TODO merge with genTable()?
     private int getColumns(File _file)
     {
         int noOfColumns = 0;
         try
         {
-            BufferedReader bf = new BufferedReader(new FileReader(_file));
+            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(_file), StandardCharsets.UTF_8));
+            //BufferedReader bf = new BufferedReader(new FileReader(_file));
             String input = bf.readLine();
             String[] columns = input.split(",");
             noOfColumns = columns.length;
@@ -121,11 +135,16 @@ public class csvToMarkdownTable
         return noOfColumns;
     }
 
+    //Generates the table in mark down.
+    //TODO Handle csv files with no alignment row.
     private void genTable()
     {
+        final int ALIGNMENT_ROW = 0;
+        final int HEADER_ROW = ALIGNMENT_ROW + 1;
+        final int FIRST_DATA_ROW = ALIGNMENT_ROW + 2;
         String[] row;
         //region Headers
-        row = rows.get(2);
+        row = rows.get(HEADER_ROW);
         for(String cell: row)
         {
             table.append(cell.trim()).append("|");
@@ -134,10 +153,8 @@ public class csvToMarkdownTable
         //endregion
 
         //region Alignment
-        row = rows.get(1); //This row has the alignment instructions
+        row = rows.get(ALIGNMENT_ROW);
         table.append("|");
-        //TODO fix this
-        //for(String cell: row)
         for(int i = 0; i < row.length; i++)
         {
             String alignment = row[i].toLowerCase().trim();
@@ -167,22 +184,6 @@ public class csvToMarkdownTable
                     table.append("---|"); //If there is no alignment instructions
                 }
             }
-//            if(alignment.equals("l") || alignment.equals("left"))
-//            {
-//                table.append(":--|");
-//            }
-//            else if(alignment.equals("r") || alignment.equals("right"))
-//            {
-//                table.append("--:|");
-//            }
-//            else if(alignment.equals("c") || alignment.equals("centre") || alignment.equals("center"))
-//            {
-//                table.append(":-:|");
-//            }
-//            else
-//            {
-//                table.append("---|"); //If there is no alignment instructions
-//            }
         }
         table.append("\n");
         //endregion
@@ -190,7 +191,7 @@ public class csvToMarkdownTable
         //region Remaining Rows
         int numberOfRows = rows.size();
 
-        for(int i = 3; i < numberOfRows; i++)
+        for(int i = FIRST_DATA_ROW; i < numberOfRows; i++)
         {
             row = rows.get(i);
             table.append("|");
@@ -205,9 +206,9 @@ public class csvToMarkdownTable
 
     public static void main(String[] args)
     {
-        String[] test = {"C:\\Users\\Blinks\\Desktop\\test.csv"};
-        csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(test));
-        //csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(args));
+        //String[] test = {"path to debugging csv"};
+        //csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(test));
+        csvToMarkdownTable runIt = new csvToMarkdownTable(getFile(args));
         runIt.genTable();
         runIt.displayTable();
     }
